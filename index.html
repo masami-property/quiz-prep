@@ -97,6 +97,15 @@
             border: 2px solid #dc3545;
             background-color: #f8d7da;
         }
+        #explanation {
+            white-space: pre-line;
+            line-height: 1.6;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 0 5px 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -144,8 +153,6 @@
                 score = 0;
                 $('score').innerText = '';
                 $('restart').style.display = 'none';
-                $('submit').style.display = 'inline-block';
-                $('next').style.display = 'inline-block';
                 displayQuiz();
             } catch (error) {
                 console.error('Error loading quiz data:', error);
@@ -177,7 +184,9 @@
             $('feedback').innerText = '';
             $('explanation').innerText = '';
             $('explanation').style.display = 'none';
+            $('submit').style.display = 'inline-block';
             $('submit').disabled = false;
+            $('next').style.display = 'none';
             $('next').disabled = true;
 
             document.querySelectorAll('.options label').forEach(label => {
@@ -229,7 +238,8 @@
                 }
             });
 
-            $('submit').disabled = true;
+            $('submit').style.display = 'none';
+            $('next').style.display = 'inline-block';
             $('next').disabled = false;
 
             const sortedSelectedKeys = [...selectedOptionKeys].sort();
@@ -247,7 +257,7 @@
 
             const explanationText = $('explanation');
             if (quiz.explanation) {
-                explanationText.innerText = `解説: ${quiz.explanation}`;
+                explanationText.textContent = `解説:\n${quiz.explanation}`;
                 explanationText.style.display = 'block';
             }
         });
