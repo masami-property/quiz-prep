@@ -168,6 +168,9 @@
                 return;
             }
 
+            $('submit').style.display = 'inline-block';
+            $('next').style.display = 'inline-block';
+
             const quiz = currentQuizSet[currentQuizIndex];
             $('question').innerText = `Q.${currentQuizIndex + 1} ${quiz.question}`;
             const optionsContainer = $('options');
