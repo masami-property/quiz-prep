@@ -144,6 +144,8 @@
                 score = 0;
                 $('score').innerText = '';
                 $('restart').style.display = 'none';
+                $('submit').style.display = 'inline-block';
+                $('next').style.display = 'inline-block';
                 displayQuiz();
             } catch (error) {
                 console.error('Error loading quiz data:', error);
@@ -167,9 +169,6 @@
                 $('restart').style.display = 'inline-block';
                 return;
             }
-
-            $('submit').style.display = 'inline-block';
-            $('next').style.display = 'inline-block';
 
             const quiz = currentQuizSet[currentQuizIndex];
             $('question').innerText = `Q.${currentQuizIndex + 1} ${quiz.question}`;
