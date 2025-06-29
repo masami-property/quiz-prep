@@ -32,6 +32,11 @@ def parse_quiz_data(input_file_path, output_file_path):
 
         image_match = re.search(r'Image: (.*)', block_content)
         image = image_match.group(1).strip() if image_match else ""
+        if image:
+            # Replace .png with .webp if present, otherwise just append .webp
+            image = re.sub(r'\.png$', '.webp', image, flags=re.IGNORECASE)
+            if not image.endswith('.webp'): # Ensure it ends with .webp
+                image += '.webp'
 
         explanation_match = re.search(r'EX.\s*(.*?)(?=\n---\nNo: |$)', block_content, re.DOTALL)
         explanation = explanation_match.group(1).strip() if explanation_match else ""
@@ -49,6 +54,6 @@ def parse_quiz_data(input_file_path, output_file_path):
         json.dump(quizzes, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
-    input_file = 'quiz_data_temp.txt'
-    output_file = '../data/quiz_data.json'
+    input_file = 'temp/quiz_data_temp.txt'
+    output_file = 'data/quiz_data.json'
     parse_quiz_data(input_file, output_file)
