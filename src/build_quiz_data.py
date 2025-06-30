@@ -5,50 +5,70 @@ def parse_quiz_data(input_file_path, output_file_path):
     with open(input_file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    quiz_blocks = re.split(r'---\nNo: (.*?)\n---', content)[1:] # Split by '---' and capture ID
+    # Split by '---' blocks and capture quiz ID
+    quiz_blocks = re.split(r'---\nNo: (.*?)\n---', content)[1:]
 
     quizzes = []
     for i in range(0, len(quiz_blocks), 2):
         quiz_id = quiz_blocks[i].strip()
         block_content = quiz_blocks[i+1].strip()
 
-        question_match = re.search(r'Q\. (.*?)(?=\n\d+\. |\nA\. |\nEX\. )', block_content, re.DOTALL)
+        # Parse question (Q.) - can be multiple lines
+        question_match = re.search(r'Q\.\s*(.*?)(?=\n\d+\.\s|\nA\.\s|\nSX\.\s|\nEX\.\s|\nImage:\s|$)', block_content, re.DOTALL)
         question = question_match.group(1).strip() if question_match else ""
 
+        # Parse options (numbered items)
         options = []
-        option_matches = re.findall(r'(\d+)\. (.*?)(?=\n\d+\. |\nA\. |\nImage: |$)', block_content, re.DOTALL)
+        option_matches = re.findall(r'(\d+)\.\s+(.*?)(?=\n\d+\.\s|\nA\.\s|\nSX\.\s|\nEX\.\s|\nImage:\s|$)', block_content, re.DOTALL)
         for key, text in option_matches:
             options.append({"key": key.strip(), "text": text.strip()})
 
-        answer_match = re.search(r'A\. (.*?)(?=\nEX\. |\nImage: |$)', block_content, re.DOTALL)
+        # Parse answer (A.)
+        answer_match = re.search(r'A\.\s+(.*?)(?=\nSX\.\s|\nEX\.\s|\nImage:\s|$)', block_content, re.DOTALL)
         answer_keys = []
         if answer_match:
-            # Split by semicolon and strip whitespace, then extract digits
-            raw_answers = answer_match.group(1)
+            raw_answers = answer_match.group(1).strip()
+            # Split by semicolon and extract numeric parts
             answers = [key.strip() for key in raw_answers.split(';') if key.strip()]
-            # Extract only the numeric part from each answer
             answer_keys = [re.match(r'\d+', ans).group() for ans in answers if re.match(r'\d+', ans)]
 
-
-        image_match = re.search(r'Image: (.*)', block_content)
-        image = image_match.group(1).strip() if image_match else ""
-        if image:
-            # Replace .png with .webp if present, otherwise just append .webp
+        # Parse image (Image:) - can appear anywhere after A.
+        image_match = re.search(r'Image:\s+(.*?)(?=\nSX\.\s|\nEX\.\s|$)', block_content, re.DOTALL)
+        image = ""
+        if image_match:
+            image = image_match.group(1).strip()
+            # Replace .png with .webp if present, otherwise append .webp
             image = re.sub(r'\.png$', '.webp', image, flags=re.IGNORECASE)
-            if not image.endswith('.webp'): # Ensure it ends with .webp
+            if not image.endswith('.webp'):
                 image += '.webp'
 
-        explanation_match = re.search(r'EX.\s*(.*?)(?=\n---\nNo: |$)', block_content, re.DOTALL)
+        # Parse short explanation (SX.) - only content after SX.
+        short_explanation_match = re.search(r'SX\.\s*(.*?)(?=\nEX\.\s|$)', block_content, re.DOTALL)
+        short_explanation = short_explanation_match.group(1).strip() if short_explanation_match else ""
+
+        # Parse explanation (EX.)
+        explanation_match = re.search(r'EX\.\s*(.*?)(?=\n---\nNo:|$)', block_content, re.DOTALL)
         explanation = explanation_match.group(1).strip() if explanation_match else ""
 
-        quizzes.append({
+        # Remove "解説: " prefix from explanation if it exists
+        if explanation.startswith("解説: "):
+            explanation = explanation[len("解説: "):].strip()
+
+        # Build quiz data
+        quiz_data = {
             "question": question,
             "options": options,
             "answer_keys": answer_keys,
             "id": quiz_id,
             "image": image,
             "explanation": explanation
-        })
+        }
+        
+        # Add short_explanation only if it exists
+        if short_explanation:
+            quiz_data["short_explanation"] = short_explanation
+
+        quizzes.append(quiz_data)
 
     with open(output_file_path, 'w', encoding='utf-8') as f:
         json.dump(quizzes, f, ensure_ascii=False, indent=2)

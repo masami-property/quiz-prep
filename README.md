@@ -13,3 +13,11 @@
   - 2024年解説：[【速報】2024年度【地域限定旅行業務取扱管理者】試験解答速報](https://www.youtube.com/watch?v=SUa1vA8uxuA)
   - 2023年解説：[【解答速報】2023年度 国内旅行業務取扱管理者 試験解答速報・解説](https://www.youtube.com/watch?v=EMI9tlrnMhs)
 - 解説内容は上記動画を参考に作成しました。ありがとうございます。
+
+## 開発者向け情報
+
+### デバッグ画面
+
+個別の問題の動作確認や解説のデバッグには、以下のURLをご利用ください。
+
+-   `https://masami-property.github.io/quiz-prep/quiz_test_tool.html`

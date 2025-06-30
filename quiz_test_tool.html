@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>地域限定旅行業務取扱管理者試験 過去問クイズ</title>
+    <title>デバッグ用クイズビューア</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,6 +23,41 @@
             text-align: center;
             color: #0056b3;
         }
+        .debug-controls {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #6c757d;
+        }
+        .debug-controls label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .debug-controls input, .debug-controls select {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .debug-controls button {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .debug-controls button:hover {
+            background-color: #545b62;
+        }
+        .quiz-info {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 3px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
         .q-sec {
             margin-bottom: 20px;
             padding-bottom: 20px;
@@ -32,7 +67,6 @@
             margin-bottom: 15px;
             font-weight: bold;
         }
-
         .options label {
             display: block;
             background-color: #e9e9e9;
@@ -81,14 +115,6 @@
             text-align: center;
             margin-top: 20px;
         }
-        #score {
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: #0056b3;
-        }
         .options label.correct {
             border: 2px solid #28a745;
             background-color: #d4edda;
@@ -128,43 +154,52 @@
             margin-top: 10px;
             color: #6c757d;
         }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>地域限定旅行業務取扱管理者 過去問クイズ</h1>
+        <h1>🔧 デバッグ用クイズビューア</h1>
+        
+        <div class="debug-controls">
+            <label for="quiz-selector">問題選択:</label>
+            <select id="quiz-selector">
+                <option value="">問題を選択してください</option>
+            </select>
+            <button id="load-quiz">表示</button>
+            
+            <div style="margin-top: 10px;">
+                <label for="quiz-id-input">問題ID直接入力:</label>
+                <input type="text" id="quiz-id-input" placeholder="例: 2024-1-(1)">
+                <button id="load-by-id">ID検索</button>
+            </div>
+        </div>
+
+        <div id="quiz-info" class="quiz-info" style="display:none;"></div>
 
         <div class="q-sec">
-            <div class="question" id="question"></div>
+            <div class="question" id="question">問題を選択してください</div>
             <div class="options" id="options"></div>
             <div class="feedback" id="feedback"></div>
             <div id="explanation" style="display:none;"></div>
         </div>
+        
         <div class="actions">
-            <button id="submit">▶️ 解答する</button>
-            <button id="next" disabled>➡️ 次の問題</button>
-            <div id="score"></div>
-            <button id="restart" style="display:none;">🔄 やり直す</button>
-            <div id="back-to-top-container" style="display:none; margin-top: 15px;">
-                <a href="index.html" style="text-decoration: underline; color: #007bff;">トップに戻る</a>
-            </div>
+            <button id="submit" disabled>▶️ 解答する</button>
+            <button id="reset">🔄 リセット</button>
         </div>
     </div>
 
     <script>
-        let allQuizzes = [], currentQuizSet = [], currentQuizIndex = 0, score = 0;
-        const NUM_QUESTIONS = 10;
+        let allQuizzes = [];
+        let currentQuiz = null;
         const $ = id => document.getElementById(id);
-
-
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
 
         async function loadQuizzes() {
             try {
@@ -176,51 +211,48 @@
                     throw new Error('クイズデータが見つかりません');
                 }
 
-                currentQuizSet = shuffleArray([...allQuizzes]).slice(0, NUM_QUESTIONS);
-                currentQuizIndex = 0;
-                score = 0;
-                $('score').innerText = '';
-                $('restart').style.display = 'none';
-                $('back-to-top-container').style.display = 'none';
-                displayQuiz();
+                populateQuizSelector();
             } catch (error) {
                 console.error('Error loading quiz data:', error);
-                $('question').innerText = '問題の読み込みに失敗しました。ページを再読み込みしてください。';
+                $('question').innerHTML = `<div class="error">問題の読み込みに失敗しました: ${error.message}</div>`;
             }
         }
 
-        function displayQuiz() {
-            if (currentQuizIndex >= currentQuizSet.length) {
-                $('question').innerText = '';
-                $('options').innerHTML = '';
-                $('feedback').innerText = '';
-                $('submit').style.display = 'none';
-                $('next').style.display = 'none';
-                $('explanation').style.display = 'none';
+        function populateQuizSelector() {
+            const selector = $('quiz-selector');
+            selector.innerHTML = '<option value="">問題を選択してください</option>';
+            
+            allQuizzes.forEach((quiz, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${index + 1}. ${quiz.id || 'ID不明'} - ${quiz.question.substring(0, 50)}...`;
+                selector.appendChild(option);
+            });
+        }
 
-                let emoji = score <= 5 ? '😢' : score <= 8 ? '😊' : '🤩';
-                $('score').innerText = `あなたのスコア: ${score} / ${NUM_QUESTIONS} 点 ${emoji}`;
-                $('restart').style.display = 'inline-block';
-                $('back-to-top-container').style.display = 'block';
-                return;
-            }
-
-            const quiz = currentQuizSet[currentQuizIndex];
-            $('question').innerText = `Q.${currentQuizIndex + 1} ${quiz.question}`;
+        function displayQuiz(quiz) {
+            if (!quiz) return;
+            
+            currentQuiz = quiz;
+            
+            // クイズ情報表示
+            const quizInfo = $('quiz-info');
+            quizInfo.innerHTML = `
+                <strong>問題ID:</strong> ${quiz.id || 'なし'} | 
+                <strong>正解:</strong> ${quiz.answer_keys.join(', ')} | 
+                <strong>画像:</strong> ${quiz.image || 'なし'} | 
+                <strong>簡単解説:</strong> ${quiz.short_explanation ? 'あり' : 'なし'}
+            `;
+            quizInfo.style.display = 'block';
+            
+            $('question').innerText = quiz.question;
             const optionsContainer = $('options');
             optionsContainer.innerHTML = '';
             $('feedback').innerText = '';
-            $('explanation').innerText = '';
             $('explanation').style.display = 'none';
-            $('submit').style.display = 'inline-block';
             $('submit').disabled = false;
-            $('next').style.display = 'none';
-            $('next').disabled = true;
 
-            document.querySelectorAll('.options label').forEach(label => {
-                label.classList.remove('correct', 'incorrect');
-            });
-
+            // 画像表示
             let questionImage = $('question-image');
             if (questionImage) questionImage.remove();
             if (quiz.image) {
@@ -228,12 +260,15 @@
                 questionImage.id = 'question-image';
                 questionImage.src = quiz.image;
                 questionImage.alt = '問題の図';
-                questionImage.style.cssText = 'max-width:100%;height:auto;display:block;margin:10px auto';
+                questionImage.style.cssText = 'max-width:100%;height:auto;display:block;margin:10px auto;border:1px solid #ddd;';
+                questionImage.onerror = function() {
+                    this.style.display = 'none';
+                    console.error('画像の読み込みに失敗しました:', quiz.image);
+                };
                 document.querySelector('.q-sec').insertBefore(questionImage, optionsContainer);
             }
 
-            const shuffledOptions = shuffleArray([...quiz.options]);
-            shuffledOptions.forEach(option => {
+            quiz.options.forEach(option => {
                 const label = document.createElement('label');
                 const input = document.createElement('input');
                 input.type = 'checkbox';
@@ -249,14 +284,13 @@
             const explanationDiv = $('explanation');
             explanationDiv.innerHTML = '';
 
-            // 簡単解説を表示
             const shortExplanation = quiz.short_explanation || quiz.explanation || '解説はありません。';
             const shortDiv = document.createElement('div');
             shortDiv.className = 'short-explanation';
-            shortDiv.textContent = `解説: ${shortExplanation}`;
+            shortDiv.textContent = `解説:
+${shortExplanation}`;
             explanationDiv.appendChild(shortDiv);
 
-            // 詳細解説がある場合は、詳細表示ボタンとエリアを作成
             if (quiz.explanation && quiz.short_explanation && quiz.explanation !== quiz.short_explanation) {
                 const toggleButton = document.createElement('button');
                 toggleButton.className = 'explanation-toggle';
@@ -283,8 +317,31 @@
             explanationDiv.style.display = 'block';
         }
 
+        $('load-quiz').addEventListener('click', () => {
+            const selectedIndex = $('quiz-selector').value;
+            if (selectedIndex !== '') {
+                displayQuiz(allQuizzes[parseInt(selectedIndex)]);
+            }
+        });
+
+        $('load-by-id').addEventListener('click', () => {
+            const inputId = $('quiz-id-input').value.trim();
+            if (inputId) {
+                const foundQuiz = allQuizzes.find(quiz => quiz.id === inputId);
+                if (foundQuiz) {
+                    displayQuiz(foundQuiz);
+                    // セレクターも更新
+                    const index = allQuizzes.indexOf(foundQuiz);
+                    $('quiz-selector').value = index;
+                } else {
+                    $('question').innerHTML = `<div class="error">問題ID "${inputId}" が見つかりません</div>`;
+                }
+            }
+        });
+
         $('submit').addEventListener('click', () => {
-            const quiz = currentQuizSet[currentQuizIndex];
+            if (!currentQuiz) return;
+
             const selectedOptionKeys = Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(input => input.value);
             const feedbackText = $('feedback');
             const allOptionLabels = document.querySelectorAll('.options label');
@@ -294,7 +351,7 @@
                 input.disabled = true;
 
                 const optionKey = input.value;
-                const isCorrectOption = quiz.answer_keys.includes(optionKey);
+                const isCorrectOption = currentQuiz.answer_keys.includes(optionKey);
                 const isSelected = selectedOptionKeys.includes(optionKey);
 
                 if (isCorrectOption) {
@@ -304,36 +361,41 @@
                 }
             });
 
-            $('submit').style.display = 'none';
-            $('next').style.display = 'inline-block';
-            $('next').disabled = false;
+            $('submit').disabled = true;
 
             const sortedSelectedKeys = [...selectedOptionKeys].sort();
-            const sortedCorrectKeys = [...quiz.answer_keys].sort();
+            const sortedCorrectKeys = [...currentQuiz.answer_keys].sort();
 
             if (sortedSelectedKeys.length === sortedCorrectKeys.length &&
                 sortedSelectedKeys.every((value, index) => value === sortedCorrectKeys[index])) {
                 feedbackText.innerText = '正解！';
                 feedbackText.className = 'feedback correct';
-                score++;
             } else {
                 feedbackText.innerText = '不正解！';
                 feedbackText.className = 'feedback incorrect';
             }
 
-            // 改良された解説表示
-            if (quiz.short_explanation || quiz.explanation) {
-                showExplanation(quiz);
+            if (currentQuiz.short_explanation || currentQuiz.explanation) {
+                showExplanation(currentQuiz);
             }
         });
 
-        $('next').addEventListener('click', () => {
-            currentQuizIndex++;
-            displayQuiz();
+        $('reset').addEventListener('click', () => {
+            if (currentQuiz) {
+                displayQuiz(currentQuiz);
+                document.querySelectorAll('.options label').forEach(label => {
+                    label.classList.remove('correct', 'incorrect');
+                    label.querySelector('input').disabled = false;
+                    label.querySelector('input').checked = false;
+                });
+            }
         });
 
-        $('restart').addEventListener('click', () => {
-            loadQuizzes();
+        // エンターキーでID検索
+        $('quiz-id-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                $('load-by-id').click();
+            }
         });
 
         loadQuizzes();
