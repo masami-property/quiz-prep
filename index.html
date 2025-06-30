@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>地域限定旅行業務取扱管理者 過去問</title>
+    <title>地域限定旅行業務取扱管理者試験 対策</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,255 +23,105 @@
             text-align: center;
             color: #0056b3;
         }
-        .q-sec {
+        .exam-info {
             margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-left: 4px solid #28a745;
+            border-radius: 0 5px 5px 0;
         }
-        .question {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .options label {
-            display: block;
-            background-color: #e9e9e9;
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .options label:hover {
-            background-color: #dcdcdc;
-        }
-        .options input[type="checkbox"] {
-            margin-right: 10px;
-        }
-        .feedback {
-            margin-top: 15px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .feedback.correct {
+        .exam-info h2 {
+            margin-top: 0;
             color: #28a745;
+            font-size: 1.3em;
         }
-        .feedback.incorrect {
-            color: #dc3545;
+        .exam-info ul {
+            list-style-type: none;
+            padding: 0;
         }
-        .btn, button {
+        .exam-info li {
+            margin-bottom: 5px;
+        }
+        .exam-info ul ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .exam-info p {
+            font-size: 0.9em;
+            color: #555;
+        }
+        .quiz-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px 20px;
             background-color: #007bff;
             color: white;
-            padding: 10px 20px;
-            border: none;
+            text-decoration: none;
             border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
+            font-size: 1.2em;
             transition: background-color 0.3s;
-            margin: 0 5px;
         }
-        .btn:hover, button:hover {
+        .quiz-link:hover {
             background-color: #0056b3;
-        }
-        .btn:disabled, button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        .actions {
-            text-align: center;
-            margin-top: 20px;
-        }
-        #score {
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 20px;
-            color: #0056b3;
-        }
-        .options label.correct {
-            border: 2px solid #28a745;
-            background-color: #d4edda;
-        }
-        .options label.incorrect {
-            border: 2px solid #dc3545;
-            background-color: #f8d7da;
-        }
-        #explanation {
-            white-space: pre-line;
-            line-height: 1.6;
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
-            border-radius: 0 5px 5px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>地域限定旅行業務取扱管理者 過去問クイズ</h1>
+        <h1>地域限定旅行業務取扱管理者試験 対策</h1>
 
-        <div class="q-sec">
-            <div class="question" id="question"></div>
-            <div class="options" id="options"></div>
-            <div class="feedback" id="feedback"></div>
-            <div id="explanation" style="display:none;"></div>
+        <div class="exam-info">
+            <h2>試験概要</h2>
+            <ul>
+                <li><strong>試験形式:</strong> マークシート形式</li>
+                <li><strong>試験時間:</strong> 120分</li>
+                <li><strong>試験科目:</strong>
+                    <ul>
+                        <li>旅行業法 4点×25問</li>
+                        <li>約款 4点×24問</li>
+                        <li>国内旅行実務 4点×10問</li>
+                        <li>(航空運送に係る運送約款と利用料金, 国内観光地理等を除く)</li>
+                    </ul>
+                </li>
+                <li><strong>科目別合格基準点:</strong>
+                    <ul>
+                        <li>旅行業法: 60/100点</li>
+                        <li>約款: 58/96点</li>
+                        <li>国内旅行実務: 24/40点</li>
+                    </ul>
+                </li>
+            </ul>
+            <p style="text-align: right; font-size: 0.9em; margin-top: 15px;">
+                詳しくは<a href="https://www.mlit.go.jp/kankocho/seisaku_seido/ryokogyoho/chiikigenteikanrisha.html" target="_blank">観光庁の地域限定旅行業務取扱管理者試験ページ</a>参照
+            </p>
         </div>
-        <div class="actions">
-            <button id="submit">▶️ 解答する</button>
-            <button id="next" disabled>➡️ 次の問題</button>
-            <div id="score"></div>
-            <button id="restart" style="display:none;">🔄 やり直す</button>
+
+        <a href="regional_travel_quiz.html" class="quiz-link">クイズを始める</a>
+
+        <p style="margin-top: 30px;">現在2024年と2023年分の問題からランダムで10問出題されます。</p>
+
+        <h2 style="margin-top: 30px;">⚠️ 免責事項</h2>
+        <p>このアプリは個人の趣味で制作したものです。問題や解説の内容について正確性を保証するものではありません。実際の試験対策においては、必ず公式の資料や信頼できる教材もあわせてご確認ください。</p>
+
+        <h2 style="margin-top: 30px;">参考資料・謝辞</h2>
+        <ul>
+            <li>過去問と回答：<a href="https://www.mlit.go.jp/kankocho/seisaku_seido/ryokogyoho/chiikigenteikanrisha.html" target="_blank">国土交通省 地域限定旅行業務取扱管理者試験</a></li>
+            <li>解説動画：
+                <ul>
+                    <li>2024年解説：<a href="https://www.youtube.com/watch?v=SUa1vA8uxuA" target="_blank">【速報】2024年度【地域限定旅行業務取扱管理者】試験解答速報</a></li>
+                    <li>2023年解説：<a href="https://www.youtube.com/watch?v=EMI9tlrnMhs" target="_blank">【解答速報】2023年度 国内旅行業務取扱管理者 試験解答速報・解説</a></li>
+                </ul>
+            </li>
+            <li>解説内容は上記動画を参考に作成しました。ありがとうございます。</li>
+        </ul>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+            <a href="https://github.com/masami-property/quiz-prep" target="_blank" style="text-decoration: none; color: #007bff;">
+                <img src="data/images/github-mark.png" alt="GitHub" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">
+                GitHubでソースコードを見る
+            </a>
         </div>
     </div>
-
-    <script>
-        let allQuizzes = [], currentQuizSet = [], currentQuizIndex = 0, score = 0;
-        const NUM_QUESTIONS = 10;
-        const $ = id => document.getElementById(id);
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        async function loadQuizzes() {
-            try {
-                const response = await fetch('data/quiz_data.json');
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                allQuizzes = await response.json();
-                if (!Array.isArray(allQuizzes) || allQuizzes.length === 0) {
-                    throw new Error('クイズデータが見つかりません');
-                }
-
-                currentQuizSet = shuffleArray([...allQuizzes]).slice(0, NUM_QUESTIONS);
-                currentQuizIndex = 0;
-                score = 0;
-                $('score').innerText = '';
-                $('restart').style.display = 'none';
-                displayQuiz();
-            } catch (error) {
-                console.error('Error loading quiz data:', error);
-                $('question').innerText = '問題の読み込みに失敗しました。ページを再読み込みしてください。';
-            }
-        }
-
-
-
-        function displayQuiz() {
-            if (currentQuizIndex >= currentQuizSet.length) {
-                $('question').innerText = '';
-                $('options').innerHTML = '';
-                $('feedback').innerText = '';
-                $('submit').style.display = 'none';
-                $('next').style.display = 'none';
-                $('explanation').style.display = 'none';
-
-                let emoji = score <= 5 ? '😢' : score <= 8 ? '😊' : '🤩';
-                $('score').innerText = `あなたのスコア: ${score} / ${NUM_QUESTIONS} 点 ${emoji}`;
-                $('restart').style.display = 'inline-block';
-                return;
-            }
-
-            const quiz = currentQuizSet[currentQuizIndex];
-            $('question').innerText = `Q.${currentQuizIndex + 1} ${quiz.question}`;
-            const optionsContainer = $('options');
-            optionsContainer.innerHTML = '';
-            $('feedback').innerText = '';
-            $('explanation').innerText = '';
-            $('explanation').style.display = 'none';
-            $('submit').style.display = 'inline-block';
-            $('submit').disabled = false;
-            $('next').style.display = 'none';
-            $('next').disabled = true;
-
-            document.querySelectorAll('.options label').forEach(label => {
-                label.classList.remove('correct', 'incorrect');
-            });
-
-            let questionImage = $('question-image');
-            if (questionImage) questionImage.remove();
-            if (quiz.image) {
-                questionImage = document.createElement('img');
-                questionImage.id = 'question-image';
-                questionImage.src = quiz.image;
-                questionImage.alt = '問題の図';
-                questionImage.style.cssText = 'max-width:100%;height:auto;display:block;margin:10px auto';
-                document.querySelector('.q-sec').insertBefore(questionImage, optionsContainer);
-            }
-
-            const shuffledOptions = shuffleArray([...quiz.options]);
-            shuffledOptions.forEach(option => {
-                const label = document.createElement('label');
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.name = 'quiz-option';
-                input.value = option.key;
-                label.appendChild(input);
-                label.appendChild(document.createTextNode(option.text));
-                optionsContainer.appendChild(label);
-            });
-        }
-
-        $('submit').addEventListener('click', () => {
-            const quiz = currentQuizSet[currentQuizIndex];
-            const selectedOptionKeys = Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(input => input.value);
-            const feedbackText = $('feedback');
-            const allOptionLabels = document.querySelectorAll('.options label');
-
-            allOptionLabels.forEach(label => {
-                const input = label.querySelector('input');
-                input.disabled = true;
-
-                const optionKey = input.value;
-                const isCorrectOption = quiz.answer_keys.includes(optionKey);
-                const isSelected = selectedOptionKeys.includes(optionKey);
-
-                if (isCorrectOption) {
-                    label.classList.add('correct');
-                } else if (isSelected) {
-                    label.classList.add('incorrect');
-                }
-            });
-
-            $('submit').style.display = 'none';
-            $('next').style.display = 'inline-block';
-            $('next').disabled = false;
-
-            const sortedSelectedKeys = [...selectedOptionKeys].sort();
-            const sortedCorrectKeys = [...quiz.answer_keys].sort();
-
-            if (sortedSelectedKeys.length === sortedCorrectKeys.length &&
-                sortedSelectedKeys.every((value, index) => value === sortedCorrectKeys[index])) {
-                feedbackText.innerText = '正解！';
-                feedbackText.className = 'feedback correct';
-                score++;
-            } else {
-                feedbackText.innerText = '不正解！';
-                feedbackText.className = 'feedback incorrect';
-            }
-
-            const explanationText = $('explanation');
-            if (quiz.explanation) {
-                explanationText.textContent = `解説:\n${quiz.explanation}`;
-                explanationText.style.display = 'block';
-            }
-        });
-
-        $('next').addEventListener('click', () => {
-            currentQuizIndex++;
-            displayQuiz();
-        });
-
-        $('restart').addEventListener('click', () => {
-            loadQuizzes();
-        });
-
-        loadQuizzes();
-    </script>
 </body>
 </html>

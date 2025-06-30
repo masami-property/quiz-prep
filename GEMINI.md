@@ -1,6 +1,10 @@
 # 地域限定旅行業務取扱管理者の過去問アプリ
+- マイナー資格すぎて過去問アプリないなあ -> じゃあ自分で作ってみるか！
 - なるべく軽く作る！ index.htmlは14KB以下にこだわる
 - https://github.com/masami-property/quiz-prep
+
+## GEMINIさんへのお願い
+- プログラミング初心者なので優しくフレンドリーに教えてください！
 
 ## 情報元
 - 過去問と回答 https://www.mlit.go.jp/kankocho/seisaku_seido/ryokogyoho/chiikigenteikanrisha.html
