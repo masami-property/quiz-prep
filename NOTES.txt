@@ -25,3 +25,17 @@
 
 詳しくは観光庁の地域限定旅行業務取扱管理者試験ページ参照
 https://www.mlit.go.jp/kankocho/seisaku_seido/ryokogyoho/chiikigenteikanrisha.html
+
+
+
+- 現在2024年と2023年分の問題からランダムで10問出題されます。
+
+## ⚠️ 免責事項
+- このアプリは個人の趣味で制作したものです。問題や解説の内容について正確性を保証するものではありません。実際の試験対策においては、必ず公式の資料や信頼できる教材もあわせてご確認ください。
+
+## 参考資料・謝辞
+- 過去問と回答：[国土交通省 地域限定旅行業務取扱管理者試験](https://www.mlit.go.jp/kankocho/seisaku_seido/ryokogyoho/chiikigenteikanrisha.html)
+- 解説動画：
+  - 2024年解説：[【速報】2024年度【地域限定旅行業務取扱管理者】試験解答速報](https://www.youtube.com/watch?v=SUa1vA8uxuA)
+  - 2023年解説：[【解答速報】2023年度 国内旅行業務取扱管理者 試験解答速報・解説](https://www.youtube.com/watch?v=EMI9tlrnMhs)
+- 解説内容は上記動画を参考に作成しました。ありがとうございます。
