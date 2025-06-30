@@ -44,7 +44,12 @@ def parse_quiz_data(input_file_path, output_file_path):
 
         # Parse short explanation (SX.) - only content after SX.
         short_explanation_match = re.search(r'SX\.\s*(.*?)(?=\nEX\.\s|$)', block_content, re.DOTALL)
-        short_explanation = short_explanation_match.group(1).strip() if short_explanation_match else ""
+        short_explanation = ""
+        if short_explanation_match:
+            short_explanation = short_explanation_match.group(1).strip()
+            # If short_explanation starts with "EX.", it means SX. was empty
+            if short_explanation.startswith("EX."):
+                short_explanation = ""
 
         # Parse explanation (EX.)
         explanation_match = re.search(r'EX\.\s*(.*?)(?=\n---\nNo:|$)', block_content, re.DOTALL)
