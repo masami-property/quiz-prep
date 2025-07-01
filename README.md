@@ -43,8 +43,10 @@ GEMINI CLI, Claude, ChatGPTの力を借りました。AI様ありがとう。
 
 ### クイズデータの更新方法
 
-1. src/quiz_data_source.yaml に手入力
-2. python3 src/yaml_to_json.py で data/quiz_data.json を更新
+1. `src/quiz_data_source.yaml` に問題データを追記・編集します。
+2. `python3 src/yaml_to_json.py` を実行します。
+   - これにより、`data/quizzes/` ディレクトリ内に問題ごとのJSONファイル（`q001.json` など）と、それらのインデックスファイル（`index.json`）が生成されます。
+   - （旧形式の `data/quiz_data.json` は、メインのアプリでは使用されなくなりました。）
 
 ### デバッグ画面
 
