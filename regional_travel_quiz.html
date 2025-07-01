@@ -249,7 +249,7 @@
 
     function displayQuiz() {
         $('progress').innerText = `問題 ${currentQuizIndex + 1} / ${NUM_QUESTIONS}`;
-        $('question').innerText = `Q.${currentQuizIndex + 1} ${currentQuiz.q}`;
+        $('question').innerText = currentQuiz.q;
         
         const optionsContainer = $('options');
         optionsContainer.innerHTML = '';
