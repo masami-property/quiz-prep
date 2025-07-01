@@ -36,13 +36,17 @@ def convert_question_format(question):
     # キーの文字 ("A", "B"...) を 0 から始まるインデックスに変換
     formatted_answer = [option_keys.index(ans) for ans in answer_keys if ans in option_keys]
 
-    return {
+    result = {
         "n": question.get("number", ""),
         "q": question.get("question", "").strip(),
         "o": formatted_options,
         "a": formatted_answer,
         "e": question.get("full_explanation", "").strip()
     }
+    image_path = question.get("image", None)
+    if image_path:
+        result["i"] = image_path
+    return result
 
 def generate_index_file(quizzes_dir, total_questions):
     """インデックスファイルを生成"""
@@ -54,7 +58,8 @@ def generate_index_file(quizzes_dir, total_questions):
             "q": "問題文 (string)",
             "o": "選択肢の配列 [[text, explanation], ...]",
             "a": "正解のインデックス配列 (number[])",
-            "e": "総合解説 (string)"
+            "e": "総合解説 (string)",
+            "i": "画像パス (string, オプション)"
         },
         "question_files": [f"q{i+1:03d}.json" for i in range(total_questions)]
     }
@@ -102,17 +107,9 @@ def main():
         index_path = generate_index_file(quizzes_dir, questions_count)
         print(f"インデックスファイルを作成: {index_path}")
         
-        # 従来のquiz_data.jsonも新しいフォーマットで生成
-        legacy_output_path = os.path.join(os.path.dirname(quizzes_dir), 'quiz_data.json')
-        all_converted_data = [convert_question_format(q) for q in yaml_data]
-        with open(legacy_output_path, 'w', encoding='utf-8') as json_file:
-            json.dump(all_converted_data, json_file, ensure_ascii=False, indent=2)
-        print(f"全問題を含むJSONファイルも作成: {legacy_output_path}")
-        
         print(f"\n✅ 変換完了!")
         print(f"📁 分割ファイル: {questions_count}個のJSONファイル -> {quizzes_dir}")
         print(f"📋 インデックス: {index_path}")
-        print(f"📦 全問題JSON: {legacy_output_path}")
 
     except FileNotFoundError:
         print(f"❌ エラー: ファイルが見つかりません。'{input_yaml_path}' を確認してください。")

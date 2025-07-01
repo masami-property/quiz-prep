@@ -6,7 +6,8 @@
     "q": "問題文 (string)",
     "o": "選択肢の配列 [[text, explanation], ...]",
     "a": "正解のインデックス配列 (number[])",
-    "e": "総合解説 (string)"
+    "e": "総合解説 (string)",
+    "i": "画像パス (string, オプション)"
   },
   "question_files": [
     "q001.json",

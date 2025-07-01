@@ -257,10 +257,10 @@
         // 画像があれば表示
         let questionImage = $('question-image');
         if (questionImage) questionImage.remove();
-        if (currentQuiz.image) { // `image` key needs to be in the new JSON if you use it
+        if (currentQuiz.i) {
             questionImage = document.createElement('img');
             questionImage.id = 'question-image';
-            questionImage.src = currentQuiz.image;
+            questionImage.src = currentQuiz.i;
             questionImage.alt = '問題の図';
             questionImage.style.cssText = 'max-width:100%;height:auto;display:block;margin:10px auto';
             $('q-sec').insertBefore(questionImage, optionsContainer);
