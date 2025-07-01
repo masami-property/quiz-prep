@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>地域限定旅行業務取扱管理者試験 過去問クイズ</title>
+    <title>地域限定旅行業務取扱管理者試験 過去問クイズ V2</title>
     <style>
         html {
             overflow-y: scroll;
@@ -108,32 +108,24 @@
             display: block;
             margin: 15px auto 0 auto;
             width: auto;
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
         }
-
-        .explanation-toggle:hover {
-            background-color: #0056b3;
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2em;
+            color: #007bff;
         }
-        .short-explanation {
-            font-weight: bold;
-            color: #495057;
-        }
-        .detailed-explanation {
-            margin-top: 10px;
-            color: #6c757d;
+        .progress {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #666;
         }
     </style>
 </head>
 <body>
 <div class="container">
     <h2 style="text-align: center;">地域限定旅行業務取扱管理者 過去問クイズ</h2>
+    <div id="progress" class="progress"></div>
     <div class="q-sec">
         <div class="question" id="question"></div>
         <div class="options" id="options"></div>
@@ -153,9 +145,10 @@
 </div>
 
 <script>
-    let allQuizzes = [], currentQuizSet = [], currentQuizIndex = 0, score = 0;
+    let allQuestionFiles = [], selectedQuestionFiles = [], currentQuizIndex = 0, score = 0, currentQuiz = null;
     const NUM_QUESTIONS = 10;
     const $ = id => document.getElementById(id);
+    const questionCache = new Map();
 
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -165,162 +158,192 @@
         return array;
     }
 
-    async function loadQuizzes() {
+    async function initializeQuiz() {
         try {
-            const response = await fetch('data/quiz_data.json');
+            const response = await fetch('data/quizzes/index.json');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            allQuizzes = await response.json();
+            const indexData = await response.json();
+            allQuestionFiles = indexData.question_files;
 
-            // 🔧 加工処理（オブジェクト→配列、answer → answer_keys、説明調整）
-            allQuizzes = allQuizzes.map(q => {
-                const optionsArray = Object.entries(q.options).map(([key, val]) => ({
-                    key,
-                    text: val.text,
-                    explanation: val.explanation
-                }));
-
-                return {
-                    ...q,
-                    options: optionsArray,
-                    answer_keys: q.answer,
-                    explanation: q.full_explanation || '',
-                };
-            });
-
-            if (!Array.isArray(allQuizzes) || allQuizzes.length === 0) {
-                throw new Error('クイズデータが見つかりません');
+            if (!Array.isArray(allQuestionFiles) || allQuestionFiles.length === 0) {
+                throw new Error('クイズのインデックスが見つかりません');
             }
 
-            currentQuizSet = shuffleArray([...allQuizzes]).slice(0, NUM_QUESTIONS);
-            currentQuizIndex = 0;
-            score = 0;
-            $('score').innerText = '';
-            $('restart').style.display = 'none';
-            $('back-to-top-container').style.display = 'none';
-            displayQuiz();
+            startNewGame();
         } catch (error) {
-            console.error('Error loading quiz data:', error);
+            console.error('Error loading quiz index:', error);
             $('question').innerText = '問題の読み込みに失敗しました。ページを再読み込みしてください。';
         }
     }
 
-    function displayQuiz() {
-        if (currentQuizIndex >= currentQuizSet.length) {
-            $('question').innerText = '';
-            $('options').innerHTML = '';
-            $('feedback').innerText = '';
-            $('submit').style.display = 'none';
-            $('next').style.display = 'none';
-            $('explanation').style.display = 'none';
-            $('explanation-toggle').style.display = 'none';
+    function startNewGame() {
+        selectedQuestionFiles = shuffleArray([...allQuestionFiles]).slice(0, NUM_QUESTIONS);
+        currentQuizIndex = 0;
+        score = 0;
+        currentQuiz = null;
+        questionCache.clear();
 
-            let emoji = score <= 5 ? '😢' : score <= 8 ? '😊' : '🤩';
-            $('score').innerText = `あなたのスコア: ${score} / ${NUM_QUESTIONS} 点 ${emoji}`;
-            $('restart').style.display = 'inline-block';
-            $('back-to-top-container').style.display = 'block';
+        $('score').innerText = '';
+        $('restart').style.display = 'none';
+        $('back-to-top-container').style.display = 'none';
+        
+        loadAndDisplayQuiz();
+        
+        // 先読み
+        if (selectedQuestionFiles.length > 1) {
+            preloadQuestion(selectedQuestionFiles[1]);
+        }
+    }
+
+    async function fetchQuestion(fileName) {
+        if (questionCache.has(fileName)) {
+            return questionCache.get(fileName);
+        }
+        const response = await fetch(`data/quizzes/${fileName}`);
+        if (!response.ok) throw new Error(`Failed to fetch ${fileName}`);
+        const data = await response.json();
+        const question = data[0]; // JSONは配列の最初の要素
+        questionCache.set(fileName, question);
+        return question;
+    }
+
+    async function preloadQuestion(fileName) {
+        try {
+            await fetchQuestion(fileName);
+        } catch (error) {
+            console.warn(`Failed to preload ${fileName}:`, error);
+        }
+    }
+
+    async function loadAndDisplayQuiz() {
+        if (currentQuizIndex >= selectedQuestionFiles.length) {
+            showFinalScore();
             return;
         }
 
-        const quiz = currentQuizSet[currentQuizIndex];
-        $('question').innerText = `Q.${currentQuizIndex + 1} ${quiz.question}`;
-        const optionsContainer = $('options');
-        optionsContainer.innerHTML = '';
+        $('question').innerHTML = '<div class="loading">📖 問題を読み込み中...</div>';
+        $('options').innerHTML = '';
         $('feedback').innerText = '';
-        $('explanation').innerText = '';
         $('explanation').style.display = 'none';
         $('explanation-toggle').style.display = 'none';
         $('submit').style.display = 'inline-block';
-        $('submit').disabled = false;
+        $('submit').disabled = true;
         $('next').style.display = 'none';
-        $('next').disabled = true;
 
+        try {
+            const fileName = selectedQuestionFiles[currentQuizIndex];
+            currentQuiz = await fetchQuestion(fileName);
+            displayQuiz();
+            $('submit').disabled = false;
+
+            // 次の問題を先読み
+            const nextIndex = currentQuizIndex + 1;
+            if (nextIndex < selectedQuestionFiles.length) {
+                preloadQuestion(selectedQuestionFiles[nextIndex]);
+            }
+        } catch (error) {
+            console.error('Error loading quiz:', error);
+            $('question').innerText = '問題の読み込みに失敗しました。';
+        }
+    }
+
+    function displayQuiz() {
+        $('progress').innerText = `問題 ${currentQuizIndex + 1} / ${NUM_QUESTIONS}`;
+        $('question').innerText = `Q.${currentQuizIndex + 1} ${currentQuiz.q}`;
+        
+        const optionsContainer = $('options');
+        optionsContainer.innerHTML = '';
+
+        // 画像があれば表示
         let questionImage = $('question-image');
         if (questionImage) questionImage.remove();
-        if (quiz.image) {
+        if (currentQuiz.image) { // `image` key needs to be in the new JSON if you use it
             questionImage = document.createElement('img');
             questionImage.id = 'question-image';
-            questionImage.src = quiz.image;
+            questionImage.src = currentQuiz.image;
             questionImage.alt = '問題の図';
             questionImage.style.cssText = 'max-width:100%;height:auto;display:block;margin:10px auto';
-            document.querySelector('.q-sec').insertBefore(questionImage, optionsContainer);
+            $('q-sec').insertBefore(questionImage, optionsContainer);
         }
 
-        const shuffledOptions = shuffleArray([...quiz.options]);
-        shuffledOptions.forEach(option => {
+        currentQuiz.o.forEach((option, index) => {
+            const [text, _] = option;
             const label = document.createElement('label');
             const input = document.createElement('input');
             input.type = 'checkbox';
             input.name = 'quiz-option';
-            input.value = option.key;
+            input.value = index; // 答えの比較用にインデックスを使用
             label.appendChild(input);
-            label.appendChild(document.createTextNode(option.text));
+            label.appendChild(document.createTextNode(text));
             optionsContainer.appendChild(label);
         });
     }
 
-    function showExplanation(quiz) {
-        const explanationDiv = $('explanation');
-        const fullExplanation = quiz.explanation || '解説はありません。';
-        explanationDiv.textContent = fullExplanation;
+    function showFinalScore() {
+        $('question').innerText = '';
+        $('options').innerHTML = '';
+        $('feedback').innerText = '';
+        $('submit').style.display = 'none';
+        $('next').style.display = 'none';
+        $('explanation').style.display = 'none';
+        $('explanation-toggle').style.display = 'none';
+        $('progress').innerText = `全 ${NUM_QUESTIONS} 問が終了しました。`;
 
-        const toggleButton = $('explanation-toggle');
-        toggleButton.style.display = 'block';
-        toggleButton.textContent = '📖 解説を見る'; 
-        explanationDiv.style.display = 'none';
+        let emoji = score <= (NUM_QUESTIONS * 0.5) ? '😢' : score <= (NUM_QUESTIONS * 0.8) ? '😊' : '🤩';
+        $('score').innerText = `あなたのスコア: ${score} / ${NUM_QUESTIONS} 点 ${emoji}`;
+        $('restart').style.display = 'inline-block';
+        $('back-to-top-container').style.display = 'block';
     }
 
     $('submit').addEventListener('click', () => {
-        const quiz = currentQuizSet[currentQuizIndex];
-        const selectedOptionKeys = Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(input => input.value);
-        const feedbackText = $('feedback');
+        const selectedOptions = Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(input => parseInt(input.value));
+        
         const allOptionLabels = document.querySelectorAll('.options label');
-
-        allOptionLabels.forEach(label => {
+        allOptionLabels.forEach((label, index) => {
             const input = label.querySelector('input');
             input.disabled = true;
 
-            const optionKey = input.value;
-            const isCorrectOption = quiz.answer_keys.includes(optionKey);
-            const isSelected = selectedOptionKeys.includes(optionKey);
+            const isCorrect = currentQuiz.a.includes(index);
+            const isSelected = selectedOptions.includes(index);
 
-            if (isCorrectOption) {
+            if (isCorrect) {
                 label.classList.add('correct');
             } else if (isSelected) {
                 label.classList.add('incorrect');
             }
 
-            const optionData = quiz.options.find(o => o.key === optionKey);
-            if (optionData && optionData.explanation) {
+            // 個別の選択肢の解説を表示
+            const [_, explanationText] = currentQuiz.o[index];
+            if (explanationText) {
                 const explanationDiv = document.createElement('div');
                 explanationDiv.className = 'option-explanation';
-                explanationDiv.style.cssText = 'margin-top: 15px; font-weight: bold; margin-left: 20px;';
-                
-                // 改行を入れるには innerHTML を使う " '解説:<br>' +  "
-                explanationDiv.innerHTML = optionData.explanation.trim().replace(/\n/g, '<br>');
-                
+                explanationDiv.style.cssText = 'margin-top: 10px; font-weight: bold; margin-left: 25px;';
+                explanationDiv.innerHTML = explanationText.trim().replace(/\n/g, '<br>');
                 label.appendChild(explanationDiv);
             }
-
         });
+
+        const sortedSelected = [...selectedOptions].sort();
+        const sortedCorrect = [...currentQuiz.a].sort();
+
+        if (JSON.stringify(sortedSelected) === JSON.stringify(sortedCorrect)) {
+            $('feedback').innerText = '正解！';
+            $('feedback').className = 'feedback correct';
+            score++;
+        } else {
+            $('feedback').innerText = '不正解';
+            $('feedback').className = 'feedback incorrect';
+        }
 
         $('submit').style.display = 'none';
         $('next').style.display = 'inline-block';
         $('next').disabled = false;
 
-        const sortedSelectedKeys = [...selectedOptionKeys].sort();
-        const sortedCorrectKeys = [...quiz.answer_keys].sort();
-
-        if (sortedSelectedKeys.length === sortedCorrectKeys.length &&
-            sortedSelectedKeys.every((value, index) => value === sortedCorrectKeys[index])) {
-            feedbackText.innerText = '正解！';
-            feedbackText.className = 'feedback correct';
-            score++;
-        } else {
-            feedbackText.innerText = '不正解';
-            feedbackText.className = 'feedback incorrect';
+        // 全体の解説を表示
+        if (currentQuiz.e) {
+            $('explanation').innerHTML = currentQuiz.e.trim().replace(/\n/g, '<br>');
+            $('explanation-toggle').style.display = 'block';
         }
-
-        showExplanation(quiz);
     });
 
     $('explanation-toggle').addEventListener('click', () => {
@@ -332,14 +355,15 @@
 
     $('next').addEventListener('click', () => {
         currentQuizIndex++;
-        displayQuiz();
+        loadAndDisplayQuiz();
     });
 
     $('restart').addEventListener('click', () => {
-        loadQuizzes();
+        startNewGame();
     });
 
-    loadQuizzes();
+    // クイズ開始
+    initializeQuiz();
 </script>
 </body>
 </html>
