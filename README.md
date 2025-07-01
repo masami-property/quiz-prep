@@ -1,0 +1,67 @@
+# 地域限定旅行業務取扱管理者試験 過去問クイズアプリ
+
+これは、地域限定旅行業務取扱管理者試験の過去問を学習するためのお試しクイズアプリです。
+
+▶️ https://masami-property.github.io/quiz-prep/
+
+マイナー資格すぎて過去問アプリないなあ  
+→ じゃあ（プログラミングとかやったことないけど）自分で作ってみるか！というノリで作られたものです。
+
+GEMINI CLI, Claude, ChatGPTの力を借りました。
+
+---
+
+## 💡 使い方
+
+- 過去問からランダムに出題されます
+- 回答後に解説が表示されます
+
+---
+
+## ⚠️ 免責事項
+
+このアプリは個人の趣味で制作したものです。  
+問題や解説の内容について正確性を保証するものではありません。  
+実際の試験対策には、必ず公式の資料や信頼できる教材をご確認ください。
+
+---
+
+## 参考資料・謝辞
+
+- 過去問と回答：[国土交通省 地域限定旅行業務取扱管理者試験](https://www.mlit.go.jp/kankocho/seisaku_seido/ryokogyoho/chiikigenteikanrisha.html)
+- 解説動画：
+  - [2024年度 試験解答速報](https://www.youtube.com/watch?v=SUa1vA8uxuA)
+  - [2023年度 試験解答速報](https://www.youtube.com/watch?v=EMI9tlrnMhs)
+
+解説内容は上記動画を参考に作成しました。ありがとうございます！
+
+---
+
+## 🛠 開発者向け情報
+
+このプロジェクトは [Gemini CLI](https://gemini-docs.dev/) を使って構築されています。
+
+### クイズデータの更新方法
+
+1. src/quiz_data_source.yaml に手入力
+2. python3 src/yaml_to_json.py で data/quiz_data.json を更新
+
+### デバッグ画面
+
+- [デバッグ画面](https://masami-property.github.io/quiz-prep/quiz_test_tool.html)
+- 問題番号を指定しきちんと読み込まれているかなどが確認できます。
+
+---
+
+## 🧱 使用技術
+
+- HTML / CSS / JavaScript
+- Gemini CLI
+- GitHub Pages
+
+---
+
+## 📄 ライセンス
+
+MITライセンス  
+（趣味で作ったものであり、商用利用等はご自身の判断でお願いします）
