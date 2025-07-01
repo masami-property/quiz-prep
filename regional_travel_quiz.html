@@ -4,123 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>地域限定旅行業務取扱管理者試験 過去問クイズ V2</title>
-    <style>
-        html {
-            overflow-y: scroll;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .q-sec {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-        }
-        .question {
-            font-size: 1em;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-        .options label {
-            display: block;
-            background-color: #e9e9e9;
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .options label:hover {
-            background-color: #dcdcdc;
-        }
-        .options input[type="checkbox"] {
-            margin-right: 10px;
-        }
-        .feedback {
-            margin-top: 15px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .feedback.correct {
-            color: #28a745;
-        }
-        .feedback.incorrect {
-            color: #dc3545;
-        }
-        .btn, button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-            margin: 0 5px;
-        }
-        .btn:hover, button:hover {
-            background-color: #0056b3;
-        }
-        .btn:disabled, button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        .actions {
-            text-align: center;
-            margin-top: 20px;
-        }
-        #score {
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: #0056b3;
-        }
-        .options label.correct {
-            border: 2px solid #28a745;
-            background-color: #d4edda;
-        }
-        .options label.incorrect {
-            border: 2px solid #dc3545;
-            background-color: #f8d7da;
-        }
-        #explanation {
-            white-space: pre-line;
-            line-height: 1.6;
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
-            border-radius: 0 5px 5px 0;
-        }
-        .explanation-toggle {
-            display: block;
-            margin: 15px auto 0 auto;
-            width: auto;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            font-size: 1.2em;
-            color: #007bff;
-        }
-        .progress {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #666;
-        }
-    </style>
+    <style>html{overflow-y:scroll}body{font-family:Arial,sans-serif;margin:20px;background-color:#f4f4f4;color:#333}.container{background-color:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.1);max-width:800px;margin:0 auto}.q-sec{margin-bottom:20px;padding-bottom:20px}.question{font-size:1em;margin-bottom:15px;font-weight:bold}.question-image{max-width:100%;height:auto;display:block;margin:15px auto}.options label{display:block;background-color:#e9e9e9;padding:10px;margin-bottom:8px;border-radius:5px;cursor:pointer;transition:background-color .3s}.options label:hover{background-color:#dcdcdc}.options input[type=checkbox]{margin-right:10px}.feedback{margin-top:15px;font-weight:bold;text-align:center}.feedback.correct{color:#28a745}.feedback.incorrect{color:#dc3545}.btn,button{background-color:#007bff;color:#fff;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;font-size:1em;transition:background-color .3s;margin:0 5px}.btn:hover,button:hover{background-color:#0056b3}.btn:disabled,button:disabled{background-color:#ccc;cursor:not-allowed}.actions{text-align:center;margin-top:20px}#score{text-align:center;font-size:1.5em;font-weight:bold;margin-top:20px;margin-bottom:10px;color:#0056b3}.options label.correct{border:2px solid #28a745;background-color:#d4edda}.options label.incorrect{border:2px solid #dc3545;background-color:#f8d7da}#explanation{white-space:pre-line;line-height:1.6;margin-top:15px;padding:15px;background-color:#f8f9fa;border-left:4px solid #007bff;border-radius:0 5px 5px 0}.explanation-toggle{display:block;margin:15px auto 0 auto;width:auto}.loading{text-align:center;padding:20px;font-size:1.2em;color:#007bff}.progress{text-align:center;margin-bottom:10px;color:#666}.option-explanation{margin-top:10px;font-weight:bold;margin-left:25px;color:#555;font-size:.9em}.image-error{background-color:#f8d7da;color:#721c24;padding:10px;border-radius:5px;margin:10px 0;text-align:center;border:1px solid #f1b0b7}</style>
 </head>
 <body>
 <div class="container">
@@ -230,6 +114,9 @@
         $('submit').disabled = true;
         $('next').style.display = 'none';
 
+        // 既存の画像とエラーメッセージを削除
+        removeExistingImageElements();
+
         try {
             const fileName = selectedQuestionFiles[currentQuizIndex];
             currentQuiz = await fetchQuestion(fileName);
@@ -247,6 +134,20 @@
         }
     }
 
+    function removeExistingImageElements() {
+        // 既存の画像要素を削除
+        const existingImage = document.querySelector('.question-image');
+        if (existingImage) {
+            existingImage.remove();
+        }
+        
+        // 既存のエラーメッセージを削除
+        const existingError = document.querySelector('.image-error');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
+
     function displayQuiz() {
         $('progress').innerText = `問題 ${currentQuizIndex + 1} / ${NUM_QUESTIONS}`;
         $('question').innerText = currentQuiz.q;
@@ -255,15 +156,34 @@
         optionsContainer.innerHTML = '';
 
         // 画像があれば表示
-        let questionImage = $('question-image');
-        if (questionImage) questionImage.remove();
         if (currentQuiz.i) {
-            questionImage = document.createElement('img');
-            questionImage.id = 'question-image';
+            const questionImage = document.createElement('img');
+            questionImage.className = 'question-image';
             questionImage.src = currentQuiz.i;
             questionImage.alt = '問題の図';
-            questionImage.style.cssText = 'max-width:100%;height:auto;display:block;margin:10px auto';
-            $('q-sec').insertBefore(questionImage, optionsContainer);
+            
+            // 画像の読み込みエラーハンドリング
+            questionImage.onerror = function() {
+                console.error('Failed to load image:', currentQuiz.i);
+                this.style.display = 'none';
+                
+                // エラーメッセージを表示
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'image-error';
+                errorDiv.textContent = `⚠️ 画像が読み込めませんでした: ${currentQuiz.i}`;
+                
+                // 問題文の後、選択肢の前に挿入
+                const qSection = document.querySelector('.q-sec');
+                qSection.insertBefore(errorDiv, optionsContainer);
+            };
+            
+            questionImage.onload = function() {
+                console.log('Image loaded successfully:', currentQuiz.i);
+            };
+            
+            // 問題文の後、選択肢の前に画像を挿入
+            const qSection = document.querySelector('.q-sec');
+            qSection.insertBefore(questionImage, optionsContainer);
         }
 
         currentQuiz.o.forEach((option, index) => {
@@ -272,7 +192,7 @@
             const input = document.createElement('input');
             input.type = 'checkbox';
             input.name = 'quiz-option';
-            input.value = index; // 答えの比較用にインデックスを使用
+            input.value = index;
             label.appendChild(input);
             label.appendChild(document.createTextNode(text));
             optionsContainer.appendChild(label);
@@ -288,6 +208,9 @@
         $('explanation').style.display = 'none';
         $('explanation-toggle').style.display = 'none';
         $('progress').innerText = `全 ${NUM_QUESTIONS} 問が終了しました。`;
+
+        // 画像要素も削除
+        removeExistingImageElements();
 
         let emoji = score <= (NUM_QUESTIONS * 0.5) ? '😢' : score <= (NUM_QUESTIONS * 0.8) ? '😊' : '🤩';
         $('score').innerText = `あなたのスコア: ${score} / ${NUM_QUESTIONS} 点 ${emoji}`;
@@ -314,10 +237,9 @@
 
             // 個別の選択肢の解説を表示
             const [_, explanationText] = currentQuiz.o[index];
-            if (explanationText) {
+            if (explanationText && explanationText.trim()) {
                 const explanationDiv = document.createElement('div');
                 explanationDiv.className = 'option-explanation';
-                explanationDiv.style.cssText = 'margin-top: 10px; font-weight: bold; margin-left: 25px;';
                 explanationDiv.innerHTML = explanationText.trim().replace(/\n/g, '<br>');
                 label.appendChild(explanationDiv);
             }
@@ -340,7 +262,7 @@
         $('next').disabled = false;
 
         // 全体の解説を表示
-        if (currentQuiz.e) {
+        if (currentQuiz.e && currentQuiz.e.trim()) {
             $('explanation').innerHTML = currentQuiz.e.trim().replace(/\n/g, '<br>');
             $('explanation-toggle').style.display = 'block';
         }
