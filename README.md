@@ -2,7 +2,7 @@
 
 これは、地域限定旅行業務取扱管理者試験の過去問を学習するためのお試しクイズアプリです。
 
-▶️ https://masami-property.github.io/quiz-prep/
+[▶️ クイズで遊ぶ](https://masami-property.github.io/quiz-prep/)
 
 マイナー資格すぎて過去問アプリないなあ  
 → じゃあ（プログラミングとかやったことないけど）自分で作ってみるか！というノリで作られたものです。
