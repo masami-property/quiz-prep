@@ -86,9 +86,10 @@
         const response = await fetch(`data/quizzes/${fileName}`);
         if (!response.ok) throw new Error(`Failed to fetch ${fileName}`);
         const data = await response.json();
-        const question = data[0]; // JSONは配列の最初の要素
-        questionCache.set(fileName, question);
-        return question;
+            const question = data[0];
+            question.o = question.o.map((option, index) => [...option, index]);
+            questionCache.set(fileName, question);
+            return question;
     }
 
     async function preloadQuestion(fileName) {
@@ -98,13 +99,11 @@
             console.warn(`Failed to preload ${fileName}:`, error);
         }
     }
-
     async function loadAndDisplayQuiz() {
         if (currentQuizIndex >= selectedQuestionFiles.length) {
             showFinalScore();
             return;
         }
-
         $('question').innerHTML = '<div class="loading">📖 問題を読み込み中...</div>';
         $('options').innerHTML = '';
         $('feedback').innerText = '';
@@ -113,8 +112,6 @@
         $('submit').style.display = 'inline-block';
         $('submit').disabled = true;
         $('next').style.display = 'none';
-
-        // 既存の画像とエラーメッセージを削除
         removeExistingImageElements();
 
         try {
@@ -123,7 +120,6 @@
             displayQuiz();
             $('submit').disabled = false;
 
-            // 次の問題を先読み
             const nextIndex = currentQuizIndex + 1;
             if (nextIndex < selectedQuestionFiles.length) {
                 preloadQuestion(selectedQuestionFiles[nextIndex]);
@@ -135,13 +131,11 @@
     }
 
     function removeExistingImageElements() {
-        // 既存の画像要素を削除
         const existingImage = document.querySelector('.question-image');
         if (existingImage) {
             existingImage.remove();
         }
-        
-        // 既存のエラーメッセージを削除
+
         const existingError = document.querySelector('.image-error');
         if (existingError) {
             existingError.remove();
@@ -155,24 +149,20 @@
         const optionsContainer = $('options');
         optionsContainer.innerHTML = '';
 
-        // 画像があれば表示
+        const shuffledOptions = shuffleArray([...currentQuiz.o]);
+
         if (currentQuiz.i) {
             const questionImage = document.createElement('img');
             questionImage.className = 'question-image';
             questionImage.src = currentQuiz.i;
             questionImage.alt = '問題の図';
-            
-            // 画像の読み込みエラーハンドリング
+
             questionImage.onerror = function() {
                 console.error('Failed to load image:', currentQuiz.i);
                 this.style.display = 'none';
-                
-                // エラーメッセージを表示
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'image-error';
                 errorDiv.textContent = `⚠️ 画像が読み込めませんでした: ${currentQuiz.i}`;
-                
-                // 問題文の後、選択肢の前に挿入
                 const qSection = document.querySelector('.q-sec');
                 qSection.insertBefore(errorDiv, optionsContainer);
             };
@@ -180,19 +170,18 @@
             questionImage.onload = function() {
                 console.log('Image loaded successfully:', currentQuiz.i);
             };
-            
-            // 問題文の後、選択肢の前に画像を挿入
             const qSection = document.querySelector('.q-sec');
             qSection.insertBefore(questionImage, optionsContainer);
         }
 
-        currentQuiz.o.forEach((option, index) => {
-            const [text, _] = option;
+        shuffledOptions.forEach((option, index) => {
+            const [text, _, originalIndex] = option;
             const label = document.createElement('label');
             const input = document.createElement('input');
             input.type = 'checkbox';
             input.name = 'quiz-option';
             input.value = index;
+            input.dataset.originalIndex = originalIndex;
             label.appendChild(input);
             label.appendChild(document.createTextNode(text));
             optionsContainer.appendChild(label);
@@ -209,7 +198,6 @@
         $('explanation-toggle').style.display = 'none';
         $('progress').innerText = `全 ${NUM_QUESTIONS} 問が終了しました。`;
 
-        // 画像要素も削除
         removeExistingImageElements();
 
         let emoji = score <= (NUM_QUESTIONS * 0.5) ? '😢' : score <= (NUM_QUESTIONS * 0.8) ? '😊' : '🤩';
@@ -222,12 +210,20 @@
         const selectedOptions = Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(input => parseInt(input.value));
         
         const allOptionLabels = document.querySelectorAll('.options label');
+        const selectedOriginalIndices = [];
+
         allOptionLabels.forEach((label, index) => {
             const input = label.querySelector('input');
             input.disabled = true;
 
-            const isCorrect = currentQuiz.a.includes(index);
-            const isSelected = selectedOptions.includes(index);
+            const originalIndex = parseInt(input.dataset.originalIndex);
+            
+            const isCorrect = currentQuiz.a.includes(originalIndex);
+            const isSelected = selectedOptions.includes(index); // ここはシャッフル後のインデックス
+
+            if (isSelected) {
+                selectedOriginalIndices.push(originalIndex);
+            }
 
             if (isCorrect) {
                 label.classList.add('correct');
@@ -235,8 +231,7 @@
                 label.classList.add('incorrect');
             }
 
-            // 個別の選択肢の解説を表示
-            const [_, explanationText] = currentQuiz.o[index];
+            const [_, explanationText] = currentQuiz.o.find(opt => opt[2] === originalIndex); // 元のインデックスで検索
             if (explanationText && explanationText.trim()) {
                 const explanationDiv = document.createElement('div');
                 explanationDiv.className = 'option-explanation';
@@ -245,7 +240,7 @@
             }
         });
 
-        const sortedSelected = [...selectedOptions].sort();
+        const sortedSelected = [...selectedOriginalIndices].sort();
         const sortedCorrect = [...currentQuiz.a].sort();
 
         if (JSON.stringify(sortedSelected) === JSON.stringify(sortedCorrect)) {
@@ -284,7 +279,6 @@
         startNewGame();
     });
 
-    // クイズ開始
     initializeQuiz();
 </script>
 </body>
