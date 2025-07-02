@@ -56,10 +56,10 @@
    - これにより、`data/quizzes/` ディレクトリ内に問題ごとのJSONファイル（`q001.json` など）と、それらのインデックスファイル（`index.json`）が生成されます。
    - （旧形式の `data/quiz_data.json` は、メインのアプリでは使用されなくなりました。）
 
-### デバッグ画面
+<!-- ### デバッグ画面
 
-- [デバッグ画面](https://masami-property.github.io/quiz-prep/quiz_test_tool.html)
-- 問題番号を指定しきちんと読み込まれているかなどが確認できます。
+開発者向けデバッグ画面（非公開推奨）
+[デバッグ画面（開発者向け）](https://masami-property.github.io/quiz-prep/quiz_test_tool.html) -->
 
 ---
 
