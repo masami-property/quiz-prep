@@ -228,30 +228,27 @@
 
     async function loadQuizzes() {
         try {
-            const response = await fetch('data/quiz_data.json');
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            allQuizzes = await response.json();
+            const indexResponse = await fetch('data/quizzes/index.json');
+            if (!indexResponse.ok) throw new Error(`HTTP error! status: ${indexResponse.status}`);
+            const indexData = await indexResponse.json();
+            const allQuestionFiles = indexData.question_files;
 
-            // データ加工処理
-            allQuizzes = allQuizzes.map((q, index) => {
-                const optionsArray = Object.entries(q.options).map(([key, val]) => ({
-                    key,
-                    text: val.text,
-                    explanation: val.explanation
-                }));
+            if (!Array.isArray(allQuestionFiles) || allQuestionFiles.length === 0) {
+                throw new Error('クイズのインデックスが見つかりません');
+            }
 
-                return {
-                    ...q,
-                    originalIndex: index,
-                    options: optionsArray,
-                    answer_keys: q.answer,
-                    explanation: q.full_explanation || '',
-                };
+            const quizPromises = allQuestionFiles.map(async (fileName, index) => {
+                const response = await fetch(`data/quizzes/${fileName}`);
+                if (!response.ok) throw new Error(`Failed to fetch ${fileName}`);
+                const data = await response.json();
+                const question = data[0];
+                question.o = question.o.map((option, optIndex) => [...option, optIndex]);
+                const match = fileName.match(/q(\d+)\.json/);
+                question.number = match ? parseInt(match[1], 10) : index + 1;
+                return question;
             });
 
-            if (!Array.isArray(allQuizzes) || allQuizzes.length === 0) {
-                throw new Error('クイズデータが見つかりません');
-            }
+            allQuizzes = await Promise.all(quizPromises);
 
             filteredQuizzes = [...allQuizzes];
             populateQuestionSelect();
@@ -270,7 +267,7 @@
         allQuizzes.forEach((quiz, index) => {
             const option = document.createElement('option');
             option.value = index;
-            option.textContent = `Q.${quiz.number}: ${quiz.question.substring(0, 50)}${quiz.question.length > 50 ? '...' : ''}`;
+            option.textContent = `Q.${quiz.number}: ${quiz.q.substring(0, 50)}${quiz.q.length > 50 ? '...' : ''}`;
             select.appendChild(option);
         });
     }
@@ -288,7 +285,7 @@
         quizzes.forEach((quiz, index) => {
             const item = document.createElement('div');
             item.className = 'question-item';
-            item.textContent = `Q.${quiz.number}: ${quiz.question}`;
+            item.textContent = `Q.${quiz.number}: ${quiz.q}`;
             item.dataset.quizIndex = quiz.originalIndex;
             
             if (selectedQuizId === quiz.originalIndex) {
@@ -334,8 +331,8 @@
             debugInfo.innerHTML = `
                 <strong>デバッグ情報:</strong><br>
                 問題ID: ${quiz.number}<br>
-                正解: ${quiz.answer_keys.join(', ')}<br>
-                選択肢数: ${quiz.options.length}個
+                正解: ${quiz.a.join(', ')}<br>
+                選択肢数: ${quiz.o.length}個
             `;
             debugInfo.style.display = 'block';
         } else {
@@ -356,7 +353,7 @@
         }
 
         const quiz = allQuizzes[currentQuizIndex];
-        $('question').innerText = `Q.${quiz.number} ${quiz.question}`;
+        $('question').innerText = `Q.${quiz.number} ${quiz.q}`;
         const optionsContainer = $('options');
         optionsContainer.innerHTML = '';
         $('feedback').innerText = '';
@@ -367,26 +364,44 @@
         $('submit').disabled = false;
 
         // 画像があれば表示
-        let questionImage = $('question-image');
-        if (questionImage) questionImage.remove();
-        if (quiz.image) {
-            questionImage = document.createElement('img');
-            questionImage.id = 'question-image';
-            questionImage.src = quiz.image;
+        const existingImage = document.querySelector('.question-image');
+        if (existingImage) existingImage.remove();
+        const existingError = document.querySelector('.image-error');
+        if (existingError) existingError.remove();
+
+        if (quiz.i) {
+            const questionImage = document.createElement('img');
+            questionImage.className = 'question-image';
+            questionImage.src = quiz.i;
             questionImage.alt = '問題の図';
-            questionImage.style.cssText = 'max-width:100%;height:auto;display:block;margin:10px auto';
-            document.querySelector('.q-sec').insertBefore(questionImage, optionsContainer);
+            
+            questionImage.onerror = function() {
+                console.error('Failed to load image:', quiz.i);
+                this.style.display = 'none';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'image-error';
+                errorDiv.textContent = `⚠️ 画像が読み込めませんでした: ${quiz.i}`;
+                const qSec = document.querySelector('.q-sec');
+                qSec.insertBefore(errorDiv, optionsContainer);
+            };
+            
+            questionImage.onload = function() {
+                console.log('Image loaded successfully:', quiz.i);
+            };
+            const qSec = document.querySelector('.q-sec');
+            qSec.insertBefore(questionImage, optionsContainer);
         }
 
         // 選択肢を表示（シャッフルしない）
-        quiz.options.forEach(option => {
+        quiz.o.forEach((option, index) => {
+            const [text, _, originalIndex] = option;
             const label = document.createElement('label');
             const input = document.createElement('input');
             input.type = 'checkbox';
             input.name = 'quiz-option';
-            input.value = option.key;
+            input.value = originalIndex;
             label.appendChild(input);
-            label.appendChild(document.createTextNode(option.text));
+            label.appendChild(document.createTextNode(text));
             optionsContainer.appendChild(label);
         });
 
@@ -402,8 +417,8 @@
 
     function showExplanation(quiz) {
         const explanationDiv = $('explanation');
-        const fullExplanation = quiz.explanation || '解説はありません。';
-        explanationDiv.textContent = fullExplanation;
+        const fullExplanation = quiz.e || '解説はありません。';
+        explanationDiv.innerHTML = fullExplanation.trim().replace(/\n/g, '<br>');
 
         const toggleButton = $('explanation-toggle');
         toggleButton.style.display = 'block';
@@ -438,7 +453,7 @@
 
     $('submit').addEventListener('click', () => {
         const quiz = allQuizzes[currentQuizIndex];
-        const selectedOptionKeys = Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(input => input.value);
+        const selectedOriginalIndices = Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(input => parseInt(input.value));
         const feedbackText = $('feedback');
         const allOptionLabels = document.querySelectorAll('.options label');
 
@@ -446,9 +461,9 @@
             const input = label.querySelector('input');
             input.disabled = true;
 
-            const optionKey = input.value;
-            const isCorrectOption = quiz.answer_keys.includes(optionKey);
-            const isSelected = selectedOptionKeys.includes(optionKey);
+            const originalIndex = parseInt(input.value);
+            const isCorrectOption = quiz.a.includes(originalIndex);
+            const isSelected = selectedOriginalIndices.includes(originalIndex);
 
             if (isCorrectOption) {
                 label.classList.add('correct');
@@ -456,19 +471,19 @@
                 label.classList.add('incorrect');
             }
 
-            const optionData = quiz.options.find(o => o.key === optionKey);
-            if (optionData && optionData.explanation) {
+            const [_, explanationText] = quiz.o.find(opt => opt[2] === originalIndex);
+            if (explanationText && explanationText.trim()) {
                 const explanationDiv = document.createElement('div');
                 explanationDiv.className = 'option-explanation';
-                explanationDiv.innerHTML = optionData.explanation.trim().replace(/\n/g, '<br>');
+                explanationDiv.innerHTML = explanationText.trim().replace(/\n/g, '<br>');
                 label.appendChild(explanationDiv);
             }
         });
 
         $('submit').style.display = 'none';
 
-        const sortedSelectedKeys = [...selectedOptionKeys].sort();
-        const sortedCorrectKeys = [...quiz.answer_keys].sort();
+        const sortedSelectedKeys = [...selectedOriginalIndices].sort();
+        const sortedCorrectKeys = [...quiz.a].sort();
 
         if (sortedSelectedKeys.length === sortedCorrectKeys.length &&
             sortedSelectedKeys.every((value, index) => value === sortedCorrectKeys[index])) {
