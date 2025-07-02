@@ -31,6 +31,11 @@
 
 ## 参考資料・謝辞
 
+- ファビコン: Twitter Twemoji (CC-BY 4.0)
+  - Graphics Title: 1f4d7.svg
+  - Graphics Author: Copyright 2020 Twitter, Inc and other contributors (https://github.com/twitter/twemoji)
+  - Graphics Source: https://github.com/twitter/twemoji/blob/master/assets/svg/1f4d7.svg
+  - Graphics License: CC-BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
 - 過去問と回答：[国土交通省 地域限定旅行業務取扱管理者試験](https://www.mlit.go.jp/kankocho/seisaku_seido/ryokogyoho/chiikigenteikanrisha.html)
 - 解説動画：
   - [2024年度 試験解答速報](https://www.youtube.com/watch?v=SUa1vA8uxuA)
