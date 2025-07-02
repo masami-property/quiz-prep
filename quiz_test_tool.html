@@ -186,6 +186,8 @@
     <div class="debug-panel">
         <div class="debug-title">🔧 デバッグ機能</div>
         
+        <input type="text" id="search-box" class="search-input" placeholder="問題文で検索...">
+        
         <div class="search-controls">
             <select id="question-select" class="select-input">
                 <option value="">問題を選択...</option>
@@ -260,12 +262,18 @@
         const select = $('question-select');
         select.innerHTML = '<option value="">問題を選択...</option>';
         
-        allQuizzes.forEach((quiz, index) => {
+        filteredQuizzes.forEach((quiz, index) => {
             const option = document.createElement('option');
-            option.value = index;
-            option.textContent = `Q.${quiz.number}`;
+            option.value = allQuizzes.indexOf(quiz); // allQuizzes内での元のインデックス
+            option.textContent = `Q.${quiz.number}: ${quiz.q.substring(0, 50)}${quiz.q.length > 50 ? '...' : ''}`;
             select.appendChild(option);
         });
+    }
+
+    function filterQuizzesByKeyword(keyword) {
+        const lowerKeyword = keyword.toLowerCase();
+        filteredQuizzes = allQuizzes.filter(q => q.q.toLowerCase().includes(lowerKeyword));
+        populateQuestionSelect(); // セレクトボックスを再生成
     }
 
     function updateQuestionList(quizzes) {
@@ -425,6 +433,16 @@
     }
 
     // イベントリスナー
+    $('search-box').addEventListener('input', (e) => {
+        const keyword = e.target.value.trim();
+        if (keyword.length === 0) {
+            filteredQuizzes = [...allQuizzes];
+        } else {
+            filterQuizzesByKeyword(keyword);
+        }
+        populateQuestionSelect();
+    });
+
     $('load-selected').addEventListener('click', () => {
         const selectedIndex = parseInt($('question-select').value);
         if (!isNaN(selectedIndex) && selectedIndex >= 0 && selectedIndex < allQuizzes.length) {
