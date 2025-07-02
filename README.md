@@ -59,7 +59,7 @@
 <!-- ### デバッグ画面
 
 開発者向けデバッグ画面（非公開推奨）
-[デバッグ画面（開発者向け）](https://masami-property.github.io/quiz-prep/quiz_test_tool.html) -->
+[デバッグ画面（開発者向け）](https://masami-property.github.io/quiz-prep/dev.html) -->
 
 ---
 
