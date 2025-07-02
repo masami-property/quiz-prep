@@ -186,16 +186,12 @@
     <div class="debug-panel">
         <div class="debug-title">🔧 デバッグ機能</div>
         
-        <input type="text" id="search-input" class="search-input" placeholder="問題文で検索...">
-        
         <div class="search-controls">
             <select id="question-select" class="select-input">
                 <option value="">問題を選択...</option>
             </select>
             <button id="load-selected" class="btn" style="margin-top: 35px;">選択した問題を表示</button>
         </div>
-        
-        <div class="question-list" id="question-list" style="display: none;"></div>
         
         <div class="current-question-info" id="current-info" style="display: none;"></div>
         
@@ -267,12 +263,14 @@
         allQuizzes.forEach((quiz, index) => {
             const option = document.createElement('option');
             option.value = index;
-            option.textContent = `Q.${quiz.number}: ${quiz.q.substring(0, 50)}${quiz.q.length > 50 ? '...' : ''}`;
+            option.textContent = `Q.${quiz.number}`;
             select.appendChild(option);
         });
     }
 
     function updateQuestionList(quizzes) {
+        // 検索機能削除のため、この関数は不要になるが、念のため残しておく
+        // 必要であれば後で削除する
         const listContainer = $('question-list');
         listContainer.innerHTML = '';
         
@@ -317,7 +315,7 @@
         const info = $('current-info');
         if (currentQuizIndex >= 0 && currentQuizIndex < allQuizzes.length) {
             const quiz = allQuizzes[currentQuizIndex];
-            info.textContent = `現在表示中: Q.${currentQuizIndex + 1} / 全${allQuizzes.length}問`;
+            info.textContent = `現在表示中: Q.${quiz.number} / 全${allQuizzes.length}問`;
             info.style.display = 'block';
         } else {
             info.style.display = 'none';
@@ -427,27 +425,12 @@
     }
 
     // イベントリスナー
-    $('search-input').addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        if (searchTerm.trim() === '') {
-            $('question-list').style.display = 'none';
-            return;
-        }
-        
-        const filtered = allQuizzes.filter(quiz => 
-            quiz.q.toLowerCase().includes(searchTerm)
-        );
-        updateQuestionList(filtered);
-    });
-
     $('load-selected').addEventListener('click', () => {
         const selectedIndex = parseInt($('question-select').value);
         if (!isNaN(selectedIndex) && selectedIndex >= 0 && selectedIndex < allQuizzes.length) {
             selectedQuizId = selectedIndex;
             currentQuizIndex = selectedIndex;
             displayQuiz();
-            $('question-list').style.display = 'none';
-            $('search-input').value = '';
         }
     });
 
