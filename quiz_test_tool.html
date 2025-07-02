@@ -435,7 +435,7 @@
         }
         
         const filtered = allQuizzes.filter(quiz => 
-            quiz.question.toLowerCase().includes(searchTerm)
+            quiz.q.toLowerCase().includes(searchTerm)
         );
         updateQuestionList(filtered);
     });
