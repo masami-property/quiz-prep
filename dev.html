@@ -177,17 +177,6 @@
             margin-top: 15px;
             font-size: 0.9em;
         }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h2 style="text-align: center;">地域限定旅行業務取扱管理者 過去問クイズ - デバッグ版</h2>
-    
-    <div class="debug-panel">
-        <div class="debug-title">🔧 デバッグ機能</div>
-        
-        <input type="text" id="search-box" class="search-input" placeholder="問題文で検索...">
-        
         .search-controls {
             display: flex;
             flex-direction: column;
@@ -208,11 +197,23 @@
         .search-controls button {
             margin-top: 0 !important; /* 既存のmargin-topを上書き */
         }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 style="text-align: center;">地域限定旅行業務取扱管理者 過去問クイズ - デバッグ版</h2>
+    
+    <div class="debug-panel">
+        <div class="debug-title">🔧 デバッグ機能</div>
+        
+        <input type="text" id="search-box" class="search-input" placeholder="問題文で検索...">
+        
+        <div class="search-controls">
             <select id="question-select" class="select-input">
                 <option value="">問題を選択...</option>
             </select>
             <button id="load-selected" class="btn" style="margin-top: 35px;">選択した問題を表示</button>
-        }
+        </div>
         
         <div class="current-question-info" id="current-info" style="display: none;"></div>
         
