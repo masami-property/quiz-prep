@@ -188,12 +188,31 @@
         
         <input type="text" id="search-box" class="search-input" placeholder="問題文で検索...">
         
-        <div class="search-controls">
+        .search-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .select-input {
+            width: 300px; /* 固定幅 */
+            box-sizing: border-box; /* パディングとボーダーを幅に含める */
+            padding: 8px 12px; /* 見た目を整えるためのパディング */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-top: 10px; /* 上の要素との間隔 */
+        }
+        .search-controls select {
+            margin-bottom: 10px; /* ドロップダウンとボタンの間にスペースを追加 */
+        }
+        .search-controls button {
+            margin-top: 0 !important; /* 既存のmargin-topを上書き */
+        }
             <select id="question-select" class="select-input">
                 <option value="">問題を選択...</option>
             </select>
             <button id="load-selected" class="btn" style="margin-top: 35px;">選択した問題を表示</button>
-        </div>
+        }
         
         <div class="current-question-info" id="current-info" style="display: none;"></div>
         
