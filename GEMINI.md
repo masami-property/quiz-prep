@@ -17,3 +17,7 @@
 - GitHubのタグ機能を使ってバージョンを管理する。
   - 例: `git tag v0.1.3`
   - 例: `git push origin v0.1.3`
+- Gitコミットメッセージは英語で記述する。
+  - 例: `feat: Add countdown to exam date`
+  - 例: `fix: Correct SVG syntax error`
+  - 例: `docs: Update README with new version info`
