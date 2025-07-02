@@ -36,8 +36,7 @@
 - 解説動画：
   - [2024年度 試験解答速報](https://www.youtube.com/watch?v=SUa1vA8uxuA)
   - [2023年度 試験解答速報](https://www.youtube.com/watch?v=EMI9tlrnMhs)
-
-解説内容は上記動画を参考に作成しました。ありがとうございます！
+  - 解説内容は上記動画を参考に作成しました。ありがとうございます！
 
 - ファビコン: Twitter Twemoji (CC-BY 4.0)
   - Graphics Title: 1f4d7.svg
@@ -49,7 +48,7 @@
 
 ## 🛠 開発者向け情報
 
-このプロジェクトは [Gemini CLI](https://gemini-docs.dev/) を使って構築されています。
+- このプロジェクトは [Gemini CLI](https://gemini-docs.dev/) を使って構築されています。
 
 ### クイズデータの更新方法
 
