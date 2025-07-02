@@ -264,7 +264,7 @@
         filteredQuizzes.forEach((quiz, index) => {
             const option = document.createElement('option');
             option.value = allQuizzes.indexOf(quiz); // allQuizzes内での元のインデックス
-            option.textContent = `Q. ${quiz.n}`;
+            option.textContent = `Q. ${quiz.n}: ${quiz.q.substring(0, 50)}${quiz.q.length > 50 ? '...' : ''}`;
             select.appendChild(option);
         });
     }
