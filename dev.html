@@ -241,8 +241,7 @@
                 const data = await response.json();
                 const question = data[0];
                 question.o = question.o.map((option, optIndex) => [...option, optIndex]);
-                const match = fileName.match(/q(\d+)\.json/);
-                question.number = match ? parseInt(match[1], 10) : index + 1;
+                // question.number = match ? parseInt(match[1], 10) : index + 1; // qXXX.jsonの番号は使わない
                 return question;
             });
 
@@ -265,7 +264,7 @@
         filteredQuizzes.forEach((quiz, index) => {
             const option = document.createElement('option');
             option.value = allQuizzes.indexOf(quiz); // allQuizzes内での元のインデックス
-            option.textContent = `Q.${quiz.number}: ${quiz.q.substring(0, 50)}${quiz.q.length > 50 ? '...' : ''}`;
+            option.textContent = `Q. ${quiz.n}`;
             select.appendChild(option);
         });
     }
@@ -291,7 +290,7 @@
         quizzes.forEach((quiz, index) => {
             const item = document.createElement('div');
             item.className = 'question-item';
-            item.textContent = `Q.${quiz.number}: ${quiz.q}`;
+            item.textContent = `Q.${quiz.n}: ${quiz.q}`;
             item.dataset.quizIndex = quiz.originalIndex;
             
             if (selectedQuizId === quiz.originalIndex) {
@@ -323,7 +322,7 @@
         const info = $('current-info');
         if (currentQuizIndex >= 0 && currentQuizIndex < allQuizzes.length) {
             const quiz = allQuizzes[currentQuizIndex];
-            info.textContent = `現在表示中: Q.${quiz.number} / 全${allQuizzes.length}問`;
+            info.textContent = `現在表示中: Q.${quiz.n} / 全${allQuizzes.length}問`;
             info.style.display = 'block';
         } else {
             info.style.display = 'none';
@@ -336,7 +335,7 @@
             const quiz = allQuizzes[currentQuizIndex];
             debugInfo.innerHTML = `
                 <strong>デバッグ情報:</strong><br>
-                問題ID: ${quiz.number}<br>
+                問題ID: ${quiz.n}<br>
                 正解: ${quiz.a.join(', ')}<br>
                 選択肢数: ${quiz.o.length}個
             `;
@@ -359,7 +358,7 @@
         }
 
         const quiz = allQuizzes[currentQuizIndex];
-        $('question').innerText = `Q.${quiz.number} ${quiz.q}`;
+        $('question').innerText = `Q.${quiz.n} ${quiz.q}`;
         const optionsContainer = $('options');
         optionsContainer.innerHTML = '';
         $('feedback').innerText = '';
